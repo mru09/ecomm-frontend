@@ -12,7 +12,6 @@ import {
   ListItemText,
 } from '@mui/material';
 import axios from 'axios';
-import {getBundleTotal} from '../../utils/bundle';
 
 const API = 'http://localhost:5000/api';
 
@@ -35,7 +34,7 @@ export default function Cart() {
   }, []);
 
   const productTotal = cart.products.reduce((sum, p) => sum + (p.price || 0), 0);
-  const bundleTotal = cart.bundles.reduce((sum, b) => sum + getBundleTotal(b), 0);
+  const bundleTotal = cart.bundles.reduce((sum, b) => sum +  (b.price || 0), 0);
   const total = productTotal + bundleTotal;
 
   return (
@@ -56,7 +55,7 @@ export default function Cart() {
             <List dense>
               {cart.products.map((p) => (
                 <ListItem key={p._id}>
-                  <ListItemText primary={`${p.name} - ₹${p.price}`} />
+                  <ListItemText primary={`${p.name} - Qty : ${p.quantity} - ₹${p.price}`} />
                 </ListItem>
               ))}
             </List>
@@ -73,22 +72,13 @@ export default function Cart() {
               No bundles in cart.
             </Typography>
           ) : (
-            cart.bundles.map((bundle) => (
-              <Box key={bundle._id} mb={2}>
-                <Typography fontWeight="bold">{bundle.name}</Typography>
-                <List dense>
-                  {bundle.products.map((p) => (
-                    <ListItem key={p._id}>
-                      <ListItemText primary={`${p.name} - ₹${p.price}`} />
-                    </ListItem>
-                  ))}
-                </List>
-                <Divider />
-                <Typography fontWeight="bold" mt={1}>
-                  Bundle Total: ₹{getBundleTotal(bundle)}
-                </Typography>
-              </Box>
-            ))
+            <List dense>
+              {cart.bundles.map((b) => (
+                <ListItem key={b._id}>
+                  <ListItemText primary={`${b.name} - Qty : ${b.quantity} - ₹${b.price}`} />
+                </ListItem>
+              ))}
+            </List>
           )}
         </CardContent>
       </Card>

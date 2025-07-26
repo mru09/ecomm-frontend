@@ -11,7 +11,6 @@ import {
   Divider,
 } from '@mui/material';
 import axios from 'axios';
-import {getBundleTotal} from '../../utils/bundle';
 
 const API = 'http://localhost:5000/api';
 
@@ -48,7 +47,7 @@ export default function BundleList() {
             </List>
             <Divider sx={{ my: 1 }} />
             <Typography variant="body2" fontWeight="bold">
-              Total Price: ₹{getBundleTotal(bundle)}
+              Total Price: ₹{bundle.discountedPrice}
             </Typography>
           </Paper>
         ))

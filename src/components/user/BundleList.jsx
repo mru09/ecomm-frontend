@@ -13,7 +13,6 @@ import {
   ListItemText,
 } from '@mui/material';
 import axios from 'axios';
-import {getBundleTotal} from '../../utils/bundle';
 
 const API = 'http://localhost:5000/api';
 
@@ -64,7 +63,7 @@ export default function BundleList() {
               ))}
             </List>
             <Typography fontWeight="bold" mt={1}>
-              Total: ₹{getBundleTotal(bundle)}
+              Total: ₹{bundle.discountedPrice}
             </Typography>
           </CardContent>
           <Box p={2}>

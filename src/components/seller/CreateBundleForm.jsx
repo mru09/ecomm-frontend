@@ -30,8 +30,8 @@ export default function CreateBundleForm() {
   };
 
   const handleCreate = async () => {
-    if (!bundleName || selectedProducts.length === 0) {
-      alert('Enter bundle name and select at least one product.');
+    if (!bundleName || selectedProducts.length < 2) {
+      alert('Enter bundle name and select at least two product.');
       return;
     }
 

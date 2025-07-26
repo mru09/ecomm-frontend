@@ -1,8 +1,13 @@
-// src/components/common/Navbar.jsx
-
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  Stack,
+} from '@mui/material';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { getRole, isLoggedIn, logout } from '../../utils/auth';
 
 export default function Navbar() {
@@ -10,36 +15,85 @@ export default function Navbar() {
   const loggedIn = isLoggedIn();
   const role = getRole();
 
-  const handleNav = (path) => () => navigate(path);
+  const linkStyle = {
+    textDecoration: 'none',
+  };
+
+  const getButtonStyle = ({ isActive }) => ({
+    color: isActive ? '#0d47a1' : '#fff',
+    backgroundColor: isActive ? '#bbdefb' : 'transparent',
+    fontWeight: isActive ? 'bold' : 500,
+    borderRadius: 4,
+    textTransform: 'none',
+    padding: '6px 12px',
+    minWidth: 'auto',
+  });
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const renderTabs = () => {
     if (!loggedIn) {
       return (
-        <>
-          <Button color="inherit" onClick={handleNav('/login')}>Login</Button>
-          <Button color="inherit" onClick={handleNav('/register')}>Register</Button>
-        </>
+        <Stack direction="row" spacing={2}>
+          <NavLink to="/login" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Login</Button>
+            )}
+          </NavLink>
+          <NavLink to="/register" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Register</Button>
+            )}
+          </NavLink>
+        </Stack>
       );
     }
 
     if (role === 'seller') {
       return (
-        <>
-          <Button color="inherit" onClick={handleNav('/seller/products')}>Products</Button>
-          <Button color="inherit" onClick={handleNav('/seller/bundles')}>Bundles</Button>
-          <Button color="inherit" onClick={logout}>Logout</Button>
-        </>
+        <Stack direction="row" spacing={2}>
+          <NavLink to="/seller/products" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Products</Button>
+            )}
+          </NavLink>
+          <NavLink to="/seller/bundles" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Bundles</Button>
+            )}
+          </NavLink>
+          <Button onClick={handleLogout} sx={{ color: 'white' }}>
+            Logout
+          </Button>
+        </Stack>
       );
     }
 
     if (role === 'user') {
       return (
-        <>
-          <Button color="inherit" onClick={handleNav('/user/products')}>Products</Button>
-          <Button color="inherit" onClick={handleNav('/user/bundles')}>Bundles</Button>
-          <Button color="inherit" onClick={handleNav('/cart')}>Cart</Button>
-          <Button color="inherit" onClick={logout}>Logout</Button>
-        </>
+        <Stack direction="row" spacing={2}>
+          <NavLink to="/user/products" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Products</Button>
+            )}
+          </NavLink>
+          <NavLink to="/user/bundles" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Bundles</Button>
+            )}
+          </NavLink>
+          <NavLink to="/cart" style={linkStyle}>
+            {({ isActive }) => (
+              <Button sx={getButtonStyle({ isActive })}>Cart</Button>
+            )}
+          </NavLink>
+          <Button onClick={handleLogout} sx={{ color: 'white' }}>
+            Logout
+          </Button>
+        </Stack>
       );
     }
 
@@ -47,18 +101,16 @@ export default function Navbar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="primary" elevation={2}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography
           variant="h6"
-          onClick={handleNav('/')}
+          onClick={() => navigate('/')}
           sx={{ cursor: 'pointer', fontWeight: 'bold' }}
         >
           EcommApp
         </Typography>
-        <Box display="flex" gap={2}>
-          {renderTabs()}
-        </Box>
+        {renderTabs()}
       </Toolbar>
     </AppBar>
   );
