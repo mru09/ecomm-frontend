@@ -1,0 +1,17 @@
+.dashboard, .bundle-display {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  h2 { color: #2c3e50; }
+  input, button {
+    display: block;
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+  }
+  .bundle-card {
+    border: 1px solid #3498db;
+    padding: 10px;
+    margin: 10px 0;
+  }
+}
