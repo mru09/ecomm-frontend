@@ -29,8 +29,9 @@ export default function Login() {
     try {
       const res = await axios.post(`${API}/${role}/login`, { email, password });
       const token = res.data.token;
+      const name = res.data.name;
 
-      dispatch(loginSuccess({ token, role }));
+      dispatch(loginSuccess({ token, role, name }));
       navigate(`/${role}/products`);
     } catch (err) {
       setError('Invalid credentials');

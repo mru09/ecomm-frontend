@@ -48,15 +48,24 @@ export default function CreateBundleForm() {
     <Box p={3}>
       <Typography variant="h5" gutterBottom>Create a New Bundle</Typography>
 
-      <TextField
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        <TextField
         label="Bundle Name"
-        fullWidth
-        sx={{ my: 2 }}
+        sx={{ my: 2, flexGrow: 1, minWidth: 200}}
         value={bundleName}
         onChange={(e) => setBundleName(e.target.value)}
-      />
+        />
+        <Button
+          variant="contained"
+          sx={{ my: 2 }}
 
-      <Box display="flex" flexWrap="wrap" gap={2}>
+          onClick={handleCreateBundle}
+        >
+          Create Bundle
+        </Button>
+      </Box>
+      
+      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
         {products.map((product) => (
           <Card key={product._id} sx={{ width: 250 }}>
             <CardContent>
@@ -73,13 +82,7 @@ export default function CreateBundleForm() {
         ))}
       </Box>
 
-      <Button
-        variant="contained"
-        sx={{ mt: 3 }}
-        onClick={handleCreateBundle}
-      >
-        Create Bundle
-      </Button>
+     
     </Box>
   );
 }

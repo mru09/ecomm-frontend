@@ -15,7 +15,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isAuthenticated, role } = useSelector((state) => state.auth);
+  const { isAuthenticated, role, name } = useSelector((state) => state.auth);
 
   const linkStyle = {
     textDecoration: 'none',
@@ -110,7 +110,7 @@ export default function Navbar() {
           onClick={() => navigate('/')}
           sx={{ cursor: 'pointer', fontWeight: 'bold' }}
         >
-          ecomm
+          Hi! {name}
         </Typography>
         {renderTabs()}
       </Toolbar>

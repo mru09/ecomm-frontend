@@ -8,12 +8,14 @@ const authSlice = createSlice({
   initialState: {
     token: token || '',
     role: role || '',
+    name: '',
     isAuthenticated: !!token,
   },
   reducers: {
     loginSuccess: (state, action) => {
       state.token = action.payload.token;
       state.role = action.payload.role;
+      state.name = action.payload.name;
       state.isAuthenticated = true;
 
       localStorage.setItem('token', action.payload.token);
@@ -22,6 +24,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.token = '';
       state.role = '';
+      state.name = '';
       state.isAuthenticated = false;
 
       localStorage.removeItem('token');
