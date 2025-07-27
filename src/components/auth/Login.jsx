@@ -1,5 +1,3 @@
-// src/components/auth/Login.jsx
-
 import React, { useState } from 'react';
 import {
   Container,
@@ -9,9 +7,12 @@ import {
   Button,
   MenuItem,
   Paper,
+  Alert,
 } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../redux/slices/authSlice';
 
 const API = 'http://localhost:5000/api';
 
@@ -19,23 +20,31 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('user');
+  const [error, setError] = useState('');
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post(`${API}/${role}s/login`, { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('role', role);
+      const res = await axios.post(`${API}/${role}/login`, { email, password });
+      const token = res.data.token;
+
+      dispatch(loginSuccess({ token, role }));
       navigate(`/${role}/products`);
     } catch (err) {
-      alert('Invalid credentials');
+      setError('Invalid credentials');
     }
   };
 
   return (
     <Container maxWidth="xs">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
-        <Typography variant="h5" mb={3} align="center">Login</Typography>
+        <Typography variant="h5" mb={3} align="center">
+          Login
+        </Typography>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField

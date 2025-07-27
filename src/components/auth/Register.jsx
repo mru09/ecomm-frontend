@@ -1,6 +1,6 @@
 // src/components/auth/Register.jsx
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Box,
@@ -9,9 +9,10 @@ import {
   Button,
   MenuItem,
   Paper,
+  Alert,
 } from '@mui/material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const API = 'http://localhost:5000/api';
 
@@ -20,19 +21,20 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
   const navigate = useNavigate();
 
-  const handleRegister = async () => {
+   const handleRegister = async () => {
     try {
-      await axios.post(`${API}/${role}s/register`, {
+      await axios.post(`${API}/${role}/register`, {
         name,
         email,
         password,
       });
-      alert('Registered successfully. Please log in.');
       navigate('/login');
     } catch (err) {
-      alert('Registration failed');
+      setError('Registration failed. Please try again.');
     }
   };
 
@@ -40,6 +42,8 @@ export default function Register() {
     <Container maxWidth="xs">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
         <Typography variant="h5" mb={3} align="center">Register</Typography>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField
@@ -72,7 +76,11 @@ export default function Register() {
             <MenuItem value="user">User</MenuItem>
             <MenuItem value="seller">Seller</MenuItem>
           </TextField>
-          <Button variant="contained" fullWidth onClick={handleRegister}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleRegister}
+          >
             Register
           </Button>
         </Box>
