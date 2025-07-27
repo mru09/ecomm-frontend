@@ -1,57 +1,58 @@
-// src/components/seller/BundleList.jsx
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Typography,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  Divider,
+  Card,
+  CardContent,
+  IconButton,
 } from '@mui/material';
-import axios from 'axios';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchBundles,
+  deleteBundle,
+} from '../../redux/slices/bundlesSlice';
 
-const API = 'http://localhost:5000/api';
-
-export default function BundleList() {
-  const [bundles, setBundles] = useState([]);
+export default function SellerBundleList() {
+  const dispatch = useDispatch();
+  const { bundles, status } = useSelector((state) => state.bundles);
 
   useEffect(() => {
-    axios
-      .get(`${API}/bundles`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      })
-      .then((res) => setBundles(res.data))
-      .catch(() => alert('Failed to load bundles'));
-  }, []);
+    dispatch(fetchBundles());
+  }, [dispatch]);
 
- return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
-        Existing Bundles
-      </Typography>
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this bundle?')) {
+      dispatch(deleteBundle(id));
+    }
+  };
 
-       {bundles.length === 0 ? (
-        <Typography>No bundles created yet.</Typography>
-      ) : (
-        bundles.map((bundle) => (
-          <Paper key={bundle._id} sx={{ p: 2, mb: 2 }}>
-            <Typography variant="subtitle1">{bundle.name}</Typography>
-            <List dense>
-              {bundle.products.map((product) => (
-                <ListItem key={product._id}>
-                  <ListItemText primary={`${product.name} - ₹${product.price}`} />
-                </ListItem>
-              ))}
-            </List>
-            <Divider sx={{ my: 1 }} />
-            <Typography variant="body2" fontWeight="bold">
-              Total Price: ₹{bundle.discountedPrice}
-            </Typography>
-          </Paper>
-        ))
-      )}
+  if (status === 'loading') return <Typography>Loading...</Typography>;
+
+  return (
+    <Box p={3}>
+      <Typography variant="h5" gutterBottom>Existing Bundles</Typography>
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        {bundles.map((bundle) => (
+          <Card key={bundle._id} sx={{ width: 300 }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="h6">{bundle.name}</Typography>
+                <IconButton onClick={() => handleDelete(bundle._id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+              <Typography variant="body2">
+                {bundle.products.length} products
+              </Typography>
+              <Typography variant="body2">
+                ₹
+                {bundle.discountedPrice.toFixed(2)}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
     </Box>
   );
 }

@@ -1,96 +1,95 @@
-// src/components/user/Cart.jsx
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
+  Typography,
   Card,
   CardContent,
-  Typography,
+  IconButton,
   Divider,
-  List,
-  ListItem,
-  ListItemText,
 } from '@mui/material';
-import axios from 'axios';
-
-const API = 'http://localhost:5000/api';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchCart,
+  removeAndRefreshCart
+} from '../../redux/slices/cartSlice';
 
 export default function Cart() {
-  const [cart, setCart] = useState({ products: [], bundles: [] });
-
-  const fetchCart = async () => {
-    try {
-      const res = await axios.get(`${API}/cart`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      setCart(res.data || { products: [], bundles: [] });
-    } catch {
-      alert('Failed to fetch cart');
-    }
-  };
+  const dispatch = useDispatch();
+  const { items, total, status } = useSelector((state) => state.cart);
 
   useEffect(() => {
-    fetchCart();
-  }, []);
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-  const productTotal = cart.products.reduce((sum, p) => sum + (p.price || 0), 0);
-  const bundleTotal = cart.bundles.reduce((sum, b) => sum +  (b.price || 0), 0);
-  const total = productTotal + bundleTotal;
+  if (status === 'loading') return <Typography>Loading cart...</Typography>;
 
   return (
-    <Box display="flex" flexDirection="column" gap={3} p={3}>
+    <Box p={3}>
       <Typography variant="h5" gutterBottom>
         Your Cart
       </Typography>
 
       {/* Products */}
-      <Card>
-        <CardContent>
-          <Typography variant="subtitle1">Products</Typography>
-          {cart.products.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
-              No products in cart.
-            </Typography>
-          ) : (
-            <List dense>
-              {cart.products.map((p) => (
-                <ListItem key={p._id}>
-                  <ListItemText primary={`${p.name} - Qty : ${p.quantity} - ₹${p.price}`} />
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
+      {items.products.length > 0 && (
+        <>
+          <Typography variant="h6">Products</Typography>
+          <Box display="flex" flexWrap="wrap" gap={2} mt={1}>
+            {items.products.map((prod) => (
+              <Card key={prod._id} sx={{ width: 250 }}>
+                <CardContent>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography>{prod.name}</Typography>
+                    <IconButton onClick={() => dispatch(removeAndRefreshCart({ type: 'product', itemId: prod._id }))}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                  <Typography variant="body2">Qty: {prod.quantity}</Typography>
+                  <Typography variant="body2">
+                    ₹{prod.price} x {prod.quantity} = ₹
+                    {(prod.price * prod.quantity).toFixed(2)}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+          <Divider sx={{ my: 2 }} />
+        </>
+      )}
 
       {/* Bundles */}
-      <Card>
-        <CardContent>
-          <Typography variant="subtitle1">Bundles</Typography>
-          {cart.bundles.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
-              No bundles in cart.
-            </Typography>
-          ) : (
-            <List dense>
-              {cart.bundles.map((b) => (
-                <ListItem key={b._id}>
-                  <ListItemText primary={`${b.name} - Qty : ${b.quantity} - ₹${b.price}`} />
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </CardContent>
-      </Card>
+      {items.bundles.length > 0 && (
+        <>
+          <Typography variant="h6">Bundles</Typography>
+          <Box display="flex" flexWrap="wrap" gap={2} mt={1}>
+            {items.bundles.map((bundle) =>
+                <Card key={bundle._id} sx={{ width: 280 }}>
+                  <CardContent>
+                    <Box display="flex" justifyContent="space-between">
+                      <Typography>{bundle.name}</Typography>
+                      <IconButton onClick={() => dispatch(removeAndRefreshCart({ type: 'bundle', itemId: bundle._id }))}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                    <Typography variant="body2">
+                      Qty: {bundle.quantity}
+                    </Typography>
+                    <Typography variant="body2">
+                      ₹{bundle.price.toFixed(2)} x {bundle.quantity} = ₹
+                      { bundle.total.toFixed(2)}
+                    </Typography>
+                  </CardContent>
+                </Card>
+            )}
+          </Box>
+          <Divider sx={{ my: 2 }} />
+        </>
+      )}
 
-      {/* Grand Total */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" fontWeight="bold">
-            Total Cart Price: ₹{total}
-          </Typography>
-        </CardContent>
-      </Card>
+      {/* Total */}
+      <Typography variant="h6" sx={{ mt: 3 }}>
+        Total: ₹{total.toFixed(2)}
+      </Typography>
     </Box>
   );
 }

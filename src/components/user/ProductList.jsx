@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Card,
@@ -6,64 +6,44 @@ import {
   Typography,
   Button,
 } from '@mui/material';
-import axios from 'axios';
-import { getRole, isLoggedIn } from '../../utils/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts } from '../../redux/slices/productsSlice';
+import { addToCart } from '../../redux/slices/cartSlice';
 
-const API = 'http://localhost:5000/api';
-
-export default function ProductList({ addToCart: externalAddToCart }) {
-  const [products, setProducts] = useState([]);
-  const role = getRole();
-
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get(`${API}/products`);
-      setProducts(res.data);
-    } catch {
-      alert('Failed to load products');
-    }
-  };
+export default function ProductList() {
+  const dispatch = useDispatch();
+  const { products, status } = useSelector((state) => state.products);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-  const addToCart = async (id) => {
-    try {
-      await axios.post(
-        `${API}/cart/add`,
-        { type: 'product', itemId: id },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-      alert('Product added to cart');
-    } catch {
-      alert('Failed to add to cart');
-    }
+  const handleAddToCart = (productId) => {
+    dispatch(addToCart({ type: 'product', itemId: productId }));
   };
 
+  if (status === 'loading') return <Typography>Loading...</Typography>;
+
   return (
-    <Box display="flex" flexWrap="wrap" gap={2} p={3}>
-      {products.map((product) => (
-        <Card key={product._id} sx={{ width: '250px', display: 'flex', flexDirection: 'column' }}>
-          <CardContent>
-            <Typography variant="h6">{product.name}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              ₹{product.price}
-            </Typography>
-          </CardContent>
-          {role === 'user' && (
-            <Box p={2}>
+    <Box p={3}>
+      <Typography variant="h5" gutterBottom>Products</Typography>
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        {products.map((product) => (
+          <Card key={product._id} sx={{ width: 250 }}>
+            <CardContent>
+              <Typography variant="h6">{product.name}</Typography>
+              <Typography variant="body2">₹{product.price}</Typography>
               <Button
                 variant="contained"
-                fullWidth
-                onClick={() => addToCart(product._id)}
+                sx={{ mt: 1 }}
+                onClick={() => handleAddToCart(product._id)}
               >
                 Add to Cart
               </Button>
-            </Box>
-          )}
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
     </Box>
   );
 }

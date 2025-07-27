@@ -1,85 +1,85 @@
-// src/components/seller/CreateBundleForm.jsx
-
 import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  TextField,
+  Card,
+  CardContent,
   Button,
   Checkbox,
-  FormControlLabel,
-  Paper,
+  TextField,
 } from '@mui/material';
-import axios from 'axios';
-
-const API = 'http://localhost:5000/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts } from '../../redux/slices/productsSlice';
+import { createBundle, fetchBundles } from '../../redux/slices/bundlesSlice';
 
 export default function CreateBundleForm() {
+  const dispatch = useDispatch();
+  const { products, status } = useSelector((state) => state.products);
+  const [selected, setSelected] = useState([]);
   const [bundleName, setBundleName] = useState('');
-  const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
 
   useEffect(() => {
-    axios.get(`${API}/products`).then((res) => setProducts(res.data));
-  }, []);
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-  const handleCheckbox = (id) => {
-    setSelectedProducts((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
     );
   };
 
-  const handleCreate = async () => {
-    if (!bundleName || selectedProducts.length < 2) {
-      alert('Enter bundle name and select at least two product.');
+  const handleCreateBundle = () => {
+    if (selected.length < 2) {
+      alert('A bundle must have at least 2 products');
       return;
     }
 
-    try {
-      await axios.post(
-        `${API}/bundles`,
-        { name: bundleName, productIds: selectedProducts },
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-      );
-      alert('Bundle created successfully');
-      setBundleName('');
-      setSelectedProducts([]);
-    } catch (err) {
-      alert('Failed to create bundle');
-    }
+    dispatch(createBundle({ name: bundleName || 'New Bundle', productIds: selected }))
+      .then(() => {
+        dispatch(fetchBundles());
+        setSelected([]);
+        setBundleName('');
+      });
   };
 
+  if (status === 'loading') return <Typography>Loading...</Typography>;
+
   return (
-    <Paper sx={{ padding: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Create a New Bundle
-      </Typography>
-      <Box display="flex" flexDirection="column" gap={2}>
-        <TextField
-          label="Bundle Name"
-          value={bundleName}
-          onChange={(e) => setBundleName(e.target.value)}
-          fullWidth
-        />
-        <Typography variant="subtitle1">Select Products:</Typography>
-        <Box display="flex" flexDirection="column" maxHeight={300} overflow="auto">
-          {products.map((product) => (
-            <FormControlLabel
-              key={product._id}
-              control={
+    <Box p={3}>
+      <Typography variant="h5" gutterBottom>Create a New Bundle</Typography>
+
+      <TextField
+        label="Bundle Name"
+        fullWidth
+        sx={{ my: 2 }}
+        value={bundleName}
+        onChange={(e) => setBundleName(e.target.value)}
+      />
+
+      <Box display="flex" flexWrap="wrap" gap={2}>
+        {products.map((product) => (
+          <Card key={product._id} sx={{ width: 250 }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="subtitle1">{product.name}</Typography>
                 <Checkbox
-                  checked={selectedProducts.includes(product._id)}
-                  onChange={() => handleCheckbox(product._id)}
+                  checked={selected.includes(product._id)}
+                  onChange={() => toggleSelect(product._id)}
                 />
-              }
-              label={`${product.name} - ₹${product.price}`}
-            />
-          ))}
-        </Box>
-        <Button variant="contained" onClick={handleCreate}>
-          Create Bundle
-        </Button>
+              </Box>
+              <Typography variant="body2">₹{product.price}</Typography>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
-    </Paper>
+
+      <Button
+        variant="contained"
+        sx={{ mt: 3 }}
+        onClick={handleCreateBundle}
+      >
+        Create Bundle
+      </Button>
+    </Box>
   );
 }
