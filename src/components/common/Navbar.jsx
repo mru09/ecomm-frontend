@@ -8,12 +8,14 @@ import {
   Stack,
 } from '@mui/material';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { getRole, isLoggedIn, logout } from '../../utils/auth';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../redux/slices/authSlice';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const loggedIn = isLoggedIn();
-  const role = getRole();
+  const dispatch = useDispatch();
+
+  const { isAuthenticated, role } = useSelector((state) => state.auth);
 
   const linkStyle = {
     textDecoration: 'none',
@@ -30,12 +32,12 @@ export default function Navbar() {
   });
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/login');
   };
 
   const renderTabs = () => {
-    if (!loggedIn) {
+    if (!isAuthenticated) {
       return (
         <Stack direction="row" spacing={2}>
           <NavLink to="/login" style={linkStyle}>
@@ -54,7 +56,7 @@ export default function Navbar() {
 
     if (role === 'seller') {
       return (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={1}>
           <NavLink to="/seller/products" style={linkStyle}>
             {({ isActive }) => (
               <Button sx={getButtonStyle({ isActive })}>Products</Button>
@@ -74,7 +76,7 @@ export default function Navbar() {
 
     if (role === 'user') {
       return (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={1}>
           <NavLink to="/user/products" style={linkStyle}>
             {({ isActive }) => (
               <Button sx={getButtonStyle({ isActive })}>Products</Button>
@@ -108,7 +110,7 @@ export default function Navbar() {
           onClick={() => navigate('/')}
           sx={{ cursor: 'pointer', fontWeight: 'bold' }}
         >
-          EcommApp
+          ecomm
         </Typography>
         {renderTabs()}
       </Toolbar>
