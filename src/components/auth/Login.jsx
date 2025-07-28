@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/slices/authSlice';
 
-const API = 'http://localhost:5000/api';
+const API = process.env.REACT_APP_API_URL;
 
 export default function Login() {
   const [email, setEmail] = useState('');
