@@ -11,7 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchCart,
-  removeAndRefreshCart
+  removeFromCart
 } from '../../redux/slices/cartSlice';
 
 export default function Cart() {
@@ -40,7 +40,7 @@ export default function Cart() {
                 <CardContent>
                   <Box display="flex" justifyContent="space-between">
                     <Typography>{prod.name}</Typography>
-                    <IconButton onClick={() => dispatch(removeAndRefreshCart({ type: 'product', itemId: prod._id }))}>
+                    <IconButton onClick={() => dispatch(removeFromCart({ type: 'product', itemId: prod._id }))}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
@@ -67,7 +67,7 @@ export default function Cart() {
                   <CardContent>
                     <Box display="flex" justifyContent="space-between">
                       <Typography>{bundle.name}</Typography>
-                      <IconButton onClick={() => dispatch(removeAndRefreshCart({ type: 'bundle', itemId: bundle._id }))}>
+                      <IconButton onClick={() => dispatch(removeFromCart({ type: 'bundle', itemId: bundle._id }))}>
                         <DeleteIcon />
                       </IconButton>
                     </Box>

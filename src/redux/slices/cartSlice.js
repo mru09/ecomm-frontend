@@ -34,14 +34,6 @@ export const removeFromCart = createAsyncThunk(
   }
 );
 
-export const removeAndRefreshCart = createAsyncThunk(
-  'cart/removeAndRefresh',
-  async ({ type, itemId }, { dispatch }) => {
-    await dispatch(removeFromCart({ type, itemId }));
-    await dispatch(fetchCart());
-  }
-);
-
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
@@ -72,6 +64,14 @@ const cartSlice = createSlice({
         state.status = 'failed';
         state.error = action.error.message;
       })
+      .addCase(removeFromCart.fulfilled, (state, action) => {
+      const { products, bundles, total } = action.payload;
+      state.items = {
+        products: products,
+        bundles: bundles,
+      };
+      state.total = total;
+    });
   },
 });
 
