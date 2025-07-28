@@ -8,7 +8,7 @@ const API = process.env.REACT_APP_API_URL;
 export const fetchProducts = createAsyncThunk('products/fetchProducts', 
   async ({ page = 1, limit = 10 } = {}, thunkAPI) => {
   const token = thunkAPI.getState().auth.token;
-  const endpoint = '/products';
+  const endpoint = '/api/products';
 
   const res = await axios.get(`${API}${endpoint}?page=${page}&limit=${limit}`, {
     headers: { Authorization: `Bearer ${token}` },

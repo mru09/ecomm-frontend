@@ -9,7 +9,7 @@ export const fetchBundles = createAsyncThunk(
   'bundles/fetchBundles',
   async ({ page = 1, limit = 10 } = {}, thunkAPI) => {
     const token = thunkAPI.getState().auth.token;
-    const endpoint = '/bundles';
+    const endpoint = '/api/bundles';
 
     const res = await axios.get(`${API}${endpoint}?page=${page}&limit=${limit}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -23,7 +23,7 @@ export const fetchBundles = createAsyncThunk(
 export const createBundle = createAsyncThunk('bundles/createBundle', async (bundleData, thunkAPI) => {
   const token = thunkAPI.getState().auth.token;
 
-  const res = await axios.post(`${API}/bundles`, bundleData, {
+  const res = await axios.post(`${API}/api/bundles`, bundleData, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -34,7 +34,7 @@ export const createBundle = createAsyncThunk('bundles/createBundle', async (bund
 export const deleteBundle = createAsyncThunk('bundles/deleteBundle', async (id, thunkAPI) => {
   const token = thunkAPI.getState().auth.token;
 
-  await axios.delete(`${API}/bundles/${id}`, {
+  await axios.delete(`${API}/api/bundles/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

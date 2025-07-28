@@ -5,7 +5,7 @@ const API_BASE = process.env.REACT_APP_API_URL;
 
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { getState }) => {
   const token = getState().auth.token;
-  const res = await axios.get(`${API_BASE}/cart`, {
+  const res = await axios.get(`${API_BASE}/api/cart`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -14,7 +14,7 @@ export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { getState
 export const addToCart = createAsyncThunk('cart/addToCart', async ({ type, itemId }, { getState }) => {
   const token = getState().auth.token;
   const response = await axios.post(
-    `${API_BASE}/cart/add`,
+    `${API_BASE}/api/cart/add`,
     { type, itemId },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -26,7 +26,7 @@ export const removeFromCart = createAsyncThunk(
   async ({ type, itemId }, { getState }) => {
     const token = getState().auth.token;
     const response = await axios.post(
-      `${API_BASE}/cart/remove`,
+      `${API_BASE}/api/cart/remove`,
       { type, itemId },
       { headers: { Authorization: `Bearer ${token}` } }
     );
