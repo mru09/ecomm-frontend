@@ -11,17 +11,16 @@ import Cart from './components/user/Cart';
 import CreateBundleForm from './components/seller/CreateBundleForm';
 import SellerBundleList from './components/seller/BundleList';
 import PrivateRoute from './components/common/PrivateRoute';
-import { getRole, isLoggedIn } from './utils/auth';
+import { useSelector } from 'react-redux';
 
 export default function App() {
-  const loggedIn = isLoggedIn();
-  const role = getRole();
+  const { isAuthenticated, role } = useSelector((state) => state.auth);
 
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to={loggedIn ? `/${role}/products` : '/login'} />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? `/${role}/products` : '/login'} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
