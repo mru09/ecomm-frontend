@@ -27,7 +27,7 @@ export default function Register() {
 
    const handleRegister = async () => {
     try {
-      await axios.post(`${API}/${role}/register`, {
+      await axios.post(`${API}/api/${role}/register`, {
         name,
         email,
         password,
