@@ -5,19 +5,19 @@ import axios from 'axios';
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Async: Fetch bundles (seller or user)
-export const fetchBundles = createAsyncThunk('bundles/fetchBundles', async (_, thunkAPI) => {
-  const token = thunkAPI.getState().auth.token;
-  const role = thunkAPI.getState().auth.role;
+export const fetchBundles = createAsyncThunk(
+  'bundles/fetchBundles',
+  async ({ page = 1, limit = 10 } = {}, thunkAPI) => {
+    const token = thunkAPI.getState().auth.token;
+    const endpoint = '/bundles';
 
-  // const endpoint = role === 'seller' ? '/seller/bundles' : '/bundles';
-  const endpoint = '/bundles';
+    const res = await axios.get(`${API}${endpoint}?page=${page}&limit=${limit}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const res = await axios.get(`${API}${endpoint}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return res.data;
-});
+    return res.data; // Expected: { bundles, totalPages, currentPage }
+  }
+);
 
 // Async: Create new bundle (seller only)
 export const createBundle = createAsyncThunk('bundles/createBundle', async (bundleData, thunkAPI) => {
@@ -60,7 +60,9 @@ const bundlesSlice = createSlice({
       })
       .addCase(fetchBundles.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.bundles = action.payload || [];
+        state.bundles = action.payload.bundles;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchBundles.rejected, (state, action) => {
         state.status = 'failed';

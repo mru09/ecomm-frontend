@@ -5,15 +5,12 @@ import axios from 'axios';
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 // Async: Fetch all products (user view or seller view)
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, thunkAPI) => {
+export const fetchProducts = createAsyncThunk('products/fetchProducts', 
+  async ({ page = 1, limit = 10 } = {}, thunkAPI) => {
   const token = thunkAPI.getState().auth.token;
-  const role = thunkAPI.getState().auth.role;
-
-  // const endpoint = role === 'seller' ? '/seller/products' : '/products';
   const endpoint = '/products';
 
-
-  const res = await axios.get(`${API}${endpoint}`, {
+  const res = await axios.get(`${API}${endpoint}?page=${page}&limit=${limit}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -26,6 +23,7 @@ const productsSlice = createSlice({
     products: [],
     status: 'idle',
     error: null,
+
   },
   reducers: {
     clearProductState: (state) => {
@@ -39,7 +37,9 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.products = action.payload || [];
+        state.products = action.payload.products;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.status = 'failed';

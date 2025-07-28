@@ -7,6 +7,7 @@ import {
   Button,
   Checkbox,
   TextField,
+  Pagination
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../../redux/slices/productsSlice';
@@ -14,18 +15,23 @@ import { createBundle, fetchBundles } from '../../redux/slices/bundlesSlice';
 
 export default function CreateBundleForm() {
   const dispatch = useDispatch();
-  const { products, status } = useSelector((state) => state.products);
+  const { products, status, totalPages } = useSelector((state) => state.products);
   const [selected, setSelected] = useState([]);
   const [bundleName, setBundleName] = useState('');
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchProducts({ page, limit: 10 }));
+  }, [dispatch, page]);
 
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
     );
+  };
+
+  const handlePageChange = (_, value) => {
+    setPage(value);
   };
 
   const handleCreateBundle = () => {
@@ -48,7 +54,7 @@ export default function CreateBundleForm() {
     <Box p={3}>
       <Typography variant="h5" gutterBottom>Create a New Bundle</Typography>
 
-      <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent='center' flexWrap="wrap" gap={2}>
         <TextField
         label="Bundle Name"
         sx={{ my: 2, flexGrow: 1, minWidth: 200}}
@@ -81,7 +87,14 @@ export default function CreateBundleForm() {
           </Card>
         ))}
       </Box>
-
+      <Box display="flex" justifyContent="center" mt={3}>
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
+      </Box>
      
     </Box>
   );

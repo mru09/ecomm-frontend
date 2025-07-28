@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
+  Pagination
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBundles } from '../../redux/slices/bundlesSlice';
@@ -12,22 +13,27 @@ import { addToCart } from '../../redux/slices/cartSlice';
 
 export default function BundleList() {
   const dispatch = useDispatch();
-  const { bundles, status } = useSelector((state) => state.bundles);
+  const { bundles, status, totalPages, currentPage } = useSelector((state) => state.bundles);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchBundles());
-  }, [dispatch]);
+    dispatch(fetchBundles({ page, limit: 10 }));
+  }, [dispatch, page]);
 
   const handleAddToCart = (bundleId) => {
     dispatch(addToCart({ type: 'bundle', itemId: bundleId }));
   };
   
+  const handlePageChange = (_, value) => {
+    setPage(value);
+  };
+
   if (status === 'loading') return <Typography>Loading...</Typography>;
 
   return (
     <Box p={3}>
       <Typography variant="h5" gutterBottom>Bundles</Typography>
-      <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box display="flex" justifyContent='center' flexWrap="wrap" gap={2}>
         {bundles.map((bundle) => (
           <Card key={bundle._id} sx={{ width: 300 }}>
             <CardContent>
@@ -48,6 +54,15 @@ export default function BundleList() {
             </CardContent>
           </Card>
         ))}
+      </Box>
+
+      <Box display="flex" justifyContent="center" mt={3}>
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={handlePageChange}
+          color="primary"
+        />
       </Box>
     </Box>
   );
